@@ -8,36 +8,48 @@
 function merge(array $input): array
 {
     $result = [];
-    while (true) {
-        $dates = array_shift($input);
 
-        if (is_null($dates)) {
-            break;
+    do {
+        $isTriggered = false;
+
+        if (count($result)) {
+            $input = $result;
+            $result = [];
         }
 
-        $updated = false;
+        while (true) {
+            $dates = array_shift($input);
 
-        foreach ($result as &$item) {
-            if ($dates[1] < $item[0] || $dates[0] > $item[1]) {
-                continue;
+            if (is_null($dates)) {
+                break;
             }
 
-            if ($dates[0] < $item[0]) {
-                $item[0] = $dates[0];
+            $updated = false;
+
+            foreach ($result as &$item) {
+                if ($dates[1] < $item[0] || $dates[0] > $item[1]) {
+                    continue;
+                }
+
+                if ($dates[0] < $item[0]) {
+                    $item[0] = $dates[0];
+                }
+
+                if ($dates[1] > $item[1]) {
+                    $item[1] = $dates[1];
+                }
+
+                $updated = true;
+                break;
             }
 
-            if ($dates[1] > $item[1]) {
-                $item[1] = $dates[1];
+            if (!$updated) {
+                $result[] = $dates;
+            } else {
+                $isTriggered = true;
             }
-
-            $updated = true;
-            break;
         }
-
-        if (!$updated) {
-            $result[] = $dates;
-        }
-    }
+    } while ($isTriggered);
 
     return $result;
 }
